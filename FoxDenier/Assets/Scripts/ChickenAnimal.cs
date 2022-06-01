@@ -4,10 +4,37 @@ using UnityEngine;
 
 public class ChickenAnimal : Animal
 {
-    protected override void LookForTarget()
+    public GameObject babyChicken;
+
+
+    protected override void GetCaught(AnimalType caughtBy)
     {
-        throw new System.NotImplementedException();
+        if (caughtBy == AnimalType.fox)
+        {
+            Destroy(gameObject);
+            caughtByInstance.GetComponentInChildren<VisualField>().visibleAnimals.Remove(this.gameObject);
+            caughtByInstance.GetComponent<Animal>().target = null;
+        } else if (caughtBy == AnimalType.chicken)
+        {
+            Instantiate(babyChicken, transform.position + Vector3.back * 3f, babyChicken.transform.rotation);
+            caughtByInstance.GetComponentInChildren<VisualField>().visibleAnimals.Remove(this.gameObject);
+            currentState = BehaviourState.loitering;
+        }
     }
 
+    public override void Search()
+    {
+        visualField.LookForPredator();
 
+        if (visualField.nearestHuntingPredator != null)
+        {
+            currentState = BehaviourState.fleeing;
+            Flee();
+        }
+        else
+        {
+            visualField.FindNearestTarget();
+            base.Search();
+        }
+    }
 }

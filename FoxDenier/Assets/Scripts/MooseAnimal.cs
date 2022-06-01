@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class MooseAnimal : Animal
 {
-    protected override void LookForTarget()
+
+    protected override void GetCaught(AnimalType caughtBy)
     {
         throw new System.NotImplementedException();
     }
 
-
+    public override void Search()
+    {
+        visualField.FindPursuingTarget();
+        base.Search();
+    }
 }

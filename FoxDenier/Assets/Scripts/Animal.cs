@@ -6,28 +6,69 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class Animal : MonoBehaviour
 {
-    private NavMeshAgent agent;
-    public behaviourState currentState;
+    public NavMeshAgent agent;
+    public float defaultSpeed = 3.5f;
+    public BehaviourState currentState;
+    public AnimalType agentType;
+    public AnimalType targetType;
     public float loiterAngles = 45f;
+    public float pursuitTime = 5.0f;
+    public float restTime = 2.0f;
+    public float pTimer;
+    private float rTimer;
     private bool isReorinting;
-    private GameObject target;
+    [System.NonSerialized] public GameObject target;
+    // public GameObject pursuedByInstance;
+    [System.NonSerialized] public GameObject caughtByInstance;
+    [System.NonSerialized] public VisualField visualField;
 
-    public enum behaviourState
+    public enum BehaviourState
     {
         loitering, fleeing, pursuing, resting
+    }
+
+    public enum AnimalType
+    {
+        chicken, fox, moose
     }
 
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        visualField = GetComponentInChildren<VisualField>();
+        agent.speed = defaultSpeed;
         isReorinting = true;
 
+        transform.localScale = Vector3.one * Random.Range(0.9f, 1.1f);
 
+        currentState = BehaviourState.loitering;
+
+        pTimer = pursuitTime;
+        rTimer = restTime;
     }
 
     void Update()
     {
-        Loiter();
+        if (currentState == BehaviourState.loitering)
+        {
+            Loiter();
+        }
+
+        if (currentState == BehaviourState.pursuing)
+        {
+            Pursue();
+        }
+
+        if (currentState == BehaviourState.resting)
+        {
+            Rest();
+        }
+
+        if (currentState == BehaviourState.fleeing)
+        {
+            Flee();
+        }
+
     }
 
 
@@ -55,22 +96,98 @@ public abstract class Animal : MonoBehaviour
                 agent.destination = transform.position + (newDirection * newDistance);
                 isReorinting = false;
 
+                
             }
         }
 
         if (agent.remainingDistance < 1f)
         {
             isReorinting = true;
+            Search();
         }
     }
 
-    protected abstract void LookForTarget();
+    public virtual void Search()
+    {
+        if (visualField.nearestTarget != null)
+        {
+            target = visualField.nearestTarget;
+            agent.destination = target.transform.position;
 
+            currentState = BehaviourState.pursuing;
+        }
+    }
     
     public virtual void Pursue()
     {
+        if (target != null)
+        {
+            agent.destination = target.transform.position;
+            if (pTimer > 0f)
+            {
+                pTimer -= Time.deltaTime;
 
+                if (Vector3.Distance(transform.position, target.transform.position) < 1.0f)
+                {
+                    if (target.GetComponent<Animal>() != null)
+                    {
+                        target.GetComponent<Animal>().caughtByInstance = this.gameObject;
+                        target.GetComponent<Animal>().GetCaught(agentType);
+                    }
+
+                    currentState = BehaviourState.resting;
+                    pTimer = pursuitTime;
+                    target = null;
+
+                } else if (pTimer <= 0f)
+                {
+                    currentState = BehaviourState.resting;
+                    pTimer = pursuitTime;
+                    target = null;
+                }
+            }
+        }
     }
+
+    public virtual void Rest()
+    {
+        if (rTimer > 0f)
+        {
+            agent.destination = transform.position;
+            transform.Rotate(0, Time.deltaTime * 360, 0);
+
+            rTimer -= Time.deltaTime;
+            if (rTimer <= 0f)
+            {
+                agent.speed = defaultSpeed;
+                currentState = BehaviourState.loitering;
+                rTimer = pursuitTime;
+            }
+        }
+    }
+
+    protected abstract void GetCaught(AnimalType caughtBy);
+
+
+    public virtual void Flee()
+    {
+        if (visualField.nearestHuntingPredator != null)
+        {
+            if (pTimer > 0f)
+            {
+                pTimer -= Time.deltaTime * 2;
+                agent.destination = transform.localPosition + (transform.position - visualField.nearestHuntingPredator.transform.position);
+
+                if (pTimer <= 0f)
+                {
+                    currentState = BehaviourState.resting;
+                    pTimer = pursuitTime;
+                }
+            }
+        }
+    }
+
+
 
     public void OnDrawGizmos()
     {
