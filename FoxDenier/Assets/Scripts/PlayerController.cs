@@ -5,6 +5,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject barrier;
+    public Camera GameCamera;
+    public float PanSpeed = 10.0f;
+    public float ZoomSpeed = 150.0f;
     private GameObject newBarrier;
     private Vector3 spawnPoint;
 
@@ -17,7 +20,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-       
+
+        Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        GameCamera.transform.position = GameCamera.transform.position + new Vector3(move.x, 0, move.y) * PanSpeed * Time.deltaTime;
+        float zoom = Input.mouseScrollDelta.y;
+        GameCamera.transform.position = GameCamera.transform.position + new Vector3(0, -zoom, 0) * ZoomSpeed * Time.deltaTime;
+
         if (Input.GetMouseButtonDown(0))
         {
             MakeBarrier();

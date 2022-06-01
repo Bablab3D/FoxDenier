@@ -14,10 +14,13 @@ public class ChickenAnimal : Animal
             Destroy(gameObject);
             caughtByInstance.GetComponentInChildren<VisualField>().visibleAnimals.Remove(this.gameObject);
             caughtByInstance.GetComponent<Animal>().target = null;
-        } else if (caughtBy == AnimalType.chicken)
+        }  
+        
+        if (caughtBy == AnimalType.chicken)
         {
             Instantiate(babyChicken, transform.position + Vector3.back * 3f, babyChicken.transform.rotation);
-            caughtByInstance.GetComponentInChildren<VisualField>().visibleAnimals.Remove(this.gameObject);
+            Debug.Log("made baby chicken");
+
             currentState = BehaviourState.loitering;
         }
     }

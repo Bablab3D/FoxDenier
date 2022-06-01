@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using TMPro;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class Animal : MonoBehaviour
 {
+    public TextMeshProUGUI stateIndicator;
+    // public GameObject playerCamera;
     public NavMeshAgent agent;
     public float defaultSpeed = 3.5f;
     public BehaviourState currentState;
@@ -49,6 +52,11 @@ public abstract class Animal : MonoBehaviour
 
     void Update()
     {
+        stateIndicator.transform.eulerAngles = new Vector3(43.22f, 0f, 0f);
+        // stateIndicator.transform.rotation = playerCamera.transform.rotation;
+
+        stateIndicator.text = currentState.ToString();
+
         if (currentState == BehaviourState.loitering)
         {
             Loiter();
@@ -123,23 +131,24 @@ public abstract class Animal : MonoBehaviour
         if (target != null)
         {
             agent.destination = target.transform.position;
+
             if (pTimer > 0f)
             {
                 pTimer -= Time.deltaTime;
 
-                if (Vector3.Distance(transform.position, target.transform.position) < 1.0f)
+                if (Vector3.Distance(this.transform.position, target.transform.position) < 2.0f)
                 {
-                    if (target.GetComponent<Animal>() != null)
-                    {
-                        target.GetComponent<Animal>().caughtByInstance = this.gameObject;
-                        target.GetComponent<Animal>().GetCaught(agentType);
-                    }
+
+                    Debug.Log(this.gameObject + " with agent type " + agentType+ " caught " + target.gameObject);
+
+                    target.GetComponent<Animal>().caughtByInstance = this.gameObject;
+                    target.GetComponent<Animal>().GetCaught(agentType);
 
                     currentState = BehaviourState.resting;
                     pTimer = pursuitTime;
-                    target = null;
-
-                } else if (pTimer <= 0f)
+                    
+                }
+                else if (pTimer <= 0f)
                 {
                     currentState = BehaviourState.resting;
                     pTimer = pursuitTime;
@@ -160,6 +169,7 @@ public abstract class Animal : MonoBehaviour
             if (rTimer <= 0f)
             {
                 agent.speed = defaultSpeed;
+                target = null;
                 currentState = BehaviourState.loitering;
                 rTimer = pursuitTime;
             }

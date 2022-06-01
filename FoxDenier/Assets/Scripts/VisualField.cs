@@ -92,8 +92,7 @@ public class VisualField : MonoBehaviour
             float distance = Vector3.Distance(transform.position, target.transform.position);
             if (distance < nearestDistance
                 && GetComponentInParent<Animal>().agentType == target.GetComponent<Animal>().targetType
-                && GetComponentInParent<Animal>().agentType != target.GetComponent<Animal>().agentType
-                && target.GetComponent<Animal>().currentState == Animal.BehaviourState.pursuing)
+                && GetComponentInParent<Animal>().agentType != target.GetComponent<Animal>().agentType)
             {
                 nearestDistance = distance;
                 nearestHuntingPredator = target;
