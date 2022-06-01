@@ -10,27 +10,29 @@ public class FoxAnimal : Animal
 
     protected override void GetCaught(AnimalType caughtBy)
     {
-        if (caughtBy == AnimalType.moose)
-        {
-            // randomly decides which side of the moose to run to.
-            int foxSide = ((int)Mathf.Sign(Random.Range(-1f, 1f)));
+        // In a previouis version, there was a Moose that could scare foxes away from the chickens, but I found that the Moose made gameplay more confusing.
 
-            Vector3 fleeDirection;
+        //if (caughtBy == AnimalType.moose)
+        //{
+        //    // randomly decides which side of the moose to run to.
+        //    int foxSide = ((int)Mathf.Sign(Random.Range(-1f, 1f)));
 
-            if (target != null)
-            {
-                fleeDirection = -1 * (this.transform.position - target.transform.position).normalized;
-            } else
-            {
-                fleeDirection = Quaternion.Euler(0, 90 * foxSide, 0) * (this.transform.position - caughtByInstance.transform.position).normalized;
-            }
+        //    Vector3 fleeDirection;
 
-            fleePoint = fleeDirection * fleeDistance;
-            caughtByInstance.GetComponentInChildren<VisualField>().nearestTarget = null;
-            agent.speed *= 3.0f;
+        //    if (target != null)
+        //    {
+        //        fleeDirection = -1 * (this.transform.position - target.transform.position).normalized;
+        //    } else
+        //    {
+        //        fleeDirection = Quaternion.Euler(0, 90 * foxSide, 0) * (this.transform.position - caughtByInstance.transform.position).normalized;
+        //    }
+
+        //    fleePoint = fleeDirection * fleeDistance;
+        //    caughtByInstance.GetComponentInChildren<VisualField>().nearestTarget = null;
+        //    agent.speed *= 3.0f;
             
-            currentState = BehaviourState.fleeing;
-        }
+        //    currentState = BehaviourState.fleeing;
+        //}
     }
 
     public override void Pursue()

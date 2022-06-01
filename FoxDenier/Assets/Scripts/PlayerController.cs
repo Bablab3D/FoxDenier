@@ -11,27 +11,24 @@ public class PlayerController : MonoBehaviour
     private GameObject newBarrier;
     private Vector3 spawnPoint;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void LateUpdate()
     {
+        CameraHandler();
+        MouseHandler();
+    }
 
-        Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        GameCamera.transform.position = GameCamera.transform.position + new Vector3(move.x, 0, move.y) * PanSpeed * Time.deltaTime;
-        float zoom = Input.mouseScrollDelta.y;
-        GameCamera.transform.position = GameCamera.transform.position + new Vector3(0, -zoom, 0) * ZoomSpeed * Time.deltaTime;
-
+    private void MouseHandler()
+    {
         if (Input.GetMouseButtonDown(0))
         {
             MakeBarrier();
         }
         if (Input.GetMouseButton(0) && newBarrier != null && spawnPoint != null)
         {
+            // this allows the player to click and drag to extend the barrier
+
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
@@ -48,13 +45,20 @@ public class PlayerController : MonoBehaviour
                     newBarrier = null;
                     MakeBarrier();
                 }
-
             }
         }
         if (Input.GetMouseButtonUp(0))
         {
             newBarrier = null;
         }
+    }
+
+    private void CameraHandler()
+    {
+        Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        GameCamera.transform.position = GameCamera.transform.position + new Vector3(move.x, 0, move.y) * PanSpeed * Time.deltaTime;
+        float zoom = Input.mouseScrollDelta.y;
+        GameCamera.transform.position = GameCamera.transform.position + new Vector3(0, -zoom, 0) * ZoomSpeed * Time.deltaTime;
     }
 
     private void MakeBarrier()

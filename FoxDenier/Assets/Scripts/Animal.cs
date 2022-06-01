@@ -8,7 +8,6 @@ using TMPro;
 public abstract class Animal : MonoBehaviour
 {
     public TextMeshProUGUI stateIndicator;
-    // public GameObject playerCamera;
     public NavMeshAgent agent;
     public float defaultSpeed = 3.5f;
     public BehaviourState currentState;
@@ -25,6 +24,8 @@ public abstract class Animal : MonoBehaviour
     [System.NonSerialized] public GameObject caughtByInstance;
     [System.NonSerialized] public VisualField visualField;
 
+    private Animator animAnim;
+
     public enum BehaviourState
     {
         loitering, fleeing, pursuing, resting
@@ -39,8 +40,10 @@ public abstract class Animal : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         visualField = GetComponentInChildren<VisualField>();
+        animAnim = GetComponentInChildren<Animator>();
         agent.speed = defaultSpeed;
         isReorinting = true;
+        stateIndicator = GetComponentInChildren<TextMeshProUGUI>();
 
         transform.localScale = Vector3.one * Random.Range(0.9f, 1.1f);
 
@@ -52,31 +55,31 @@ public abstract class Animal : MonoBehaviour
 
     void Update()
     {
+        // 43.22 is the current angle of the camera. I know this is a bad magic number 
+        // but I couldn't be bothered doing the whole make GameManager a singleton and get camera from GameManager thing.
+        // this script works for the meantime to get the status indicator UI element to appear correctly on the players screen.
+
         stateIndicator.transform.eulerAngles = new Vector3(43.22f, 0f, 0f);
         // stateIndicator.transform.rotation = playerCamera.transform.rotation;
 
         stateIndicator.text = currentState.ToString();
 
-        if (currentState == BehaviourState.loitering)
+        // this checks the current state of the animal, which is manipulated by various functions
+        switch (currentState)
         {
-            Loiter();
+            case BehaviourState.loitering:
+                Loiter();
+                break;
+            case BehaviourState.pursuing:
+                Pursue();
+                break;
+            case BehaviourState.resting:
+                Rest();
+                break;
+            case BehaviourState.fleeing:
+                Flee();
+                break;
         }
-
-        if (currentState == BehaviourState.pursuing)
-        {
-            Pursue();
-        }
-
-        if (currentState == BehaviourState.resting)
-        {
-            Rest();
-        }
-
-        if (currentState == BehaviourState.fleeing)
-        {
-            Flee();
-        }
-
     }
 
 
@@ -85,6 +88,8 @@ public abstract class Animal : MonoBehaviour
         Vector3 newDirection;
         float newDistance = 5;
         NavMeshHit hit;
+
+        animAnim.SetBool("Eat_b", false);
 
         if (isReorinting)
         {
@@ -108,6 +113,8 @@ public abstract class Animal : MonoBehaviour
             }
         }
 
+        // if the animal gets close enough to their current random loiter waypoint, reorient and search for prey or predators
+
         if (agent.remainingDistance < 1f)
         {
             isReorinting = true;
@@ -117,8 +124,12 @@ public abstract class Animal : MonoBehaviour
 
     public virtual void Search()
     {
+        // this class is overridden in both the fox and the chicken child classes
+
         if (visualField.nearestTarget != null)
         {
+            // the visual field is a rectangular object child of the animal that keeps track of targets and predators
+
             target = visualField.nearestTarget;
             agent.destination = target.transform.position;
 
@@ -136,10 +147,12 @@ public abstract class Animal : MonoBehaviour
             {
                 pTimer -= Time.deltaTime;
 
+                // When the animal gets close enough to its target, catch the target
+
                 if (Vector3.Distance(this.transform.position, target.transform.position) < 2.0f)
                 {
 
-                    Debug.Log(this.gameObject + " with agent type " + agentType+ " caught " + target.gameObject);
+                    // Debug.Log(this.gameObject + " with agent type " + agentType+ " caught " + target.gameObject);
 
                     target.GetComponent<Animal>().caughtByInstance = this.gameObject;
                     target.GetComponent<Animal>().GetCaught(agentType);
@@ -156,14 +169,26 @@ public abstract class Animal : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            currentState = BehaviourState.resting;
+
+        }
     }
 
     public virtual void Rest()
     {
+        // play the little eating animation while resting, regardless of whether or not animal just caught something
+        animAnim.SetBool("Eat_b", true);
+
         if (rTimer > 0f)
         {
             agent.destination = transform.position;
-            transform.Rotate(0, Time.deltaTime * 360, 0);
+
+            //transform.Rotate(0, Time.deltaTime * 360, 0);
+
+            // I did have the animals rotating while resting but that looked weird so I removed it.
+
 
             rTimer -= Time.deltaTime;
             if (rTimer <= 0f)
@@ -171,7 +196,7 @@ public abstract class Animal : MonoBehaviour
                 agent.speed = defaultSpeed;
                 target = null;
                 currentState = BehaviourState.loitering;
-                rTimer = pursuitTime;
+                rTimer = restTime;
             }
         }
     }
@@ -181,12 +206,14 @@ public abstract class Animal : MonoBehaviour
 
     public virtual void Flee()
     {
+        // Use visual field child object to find nearby predators.
+
         if (visualField.nearestHuntingPredator != null)
         {
             if (pTimer > 0f)
             {
                 pTimer -= Time.deltaTime * 2;
-                agent.destination = transform.localPosition + (transform.position - visualField.nearestHuntingPredator.transform.position);
+                agent.destination = transform.localPosition - visualField.nearestHuntingPredator.transform.localPosition;
 
                 if (pTimer <= 0f)
                 {
@@ -197,8 +224,7 @@ public abstract class Animal : MonoBehaviour
         }
     }
 
-
-
+    // Gizmos just to make sure the navmesh pathfinding is all working
     public void OnDrawGizmos()
     {
         if (agent != null)

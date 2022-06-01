@@ -17,6 +17,8 @@ public class BarrierHandler : MonoBehaviour
     {
         if (barrierDuration > 0)
         {
+            // The new barriers that the player create slowly sink into the ground over 5 seconds and then are destroyed
+
             transform.position = new Vector3(transform.position.x,transform.position.y - (Time.deltaTime / barrierDuration), transform.position.z);
             barrierDuration -= Time.deltaTime;
         }

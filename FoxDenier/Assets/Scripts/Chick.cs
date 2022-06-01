@@ -6,6 +6,10 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Chick : MonoBehaviour
 {
+    // Chicks were spawned by mating chickens in an earlier version, but was cut because I couldn't be bothered getting it to work well.
+
+
+
     public GameObject grownChicken;
     public float secondsToGrow = 5.0f;
     private float t;

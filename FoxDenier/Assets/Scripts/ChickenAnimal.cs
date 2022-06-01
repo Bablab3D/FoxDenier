@@ -16,13 +16,17 @@ public class ChickenAnimal : Animal
             caughtByInstance.GetComponent<Animal>().target = null;
         }  
         
-        if (caughtBy == AnimalType.chicken)
-        {
-            Instantiate(babyChicken, transform.position + Vector3.back * 3f, babyChicken.transform.rotation);
-            Debug.Log("made baby chicken");
+        // In an earlier version, chickens made little baby chicks when they met up with eachother,
+        // but I removed the breeding because I couldn't figure out how best to not let the breeding get out of hand.
+        // Also, the breeding was super buggy and sometimes wouldn't work for reasons that I couldn't figure out.
 
-            currentState = BehaviourState.loitering;
-        }
+        //if (caughtBy == AnimalType.chicken)
+        //{
+        //    Instantiate(babyChicken, transform.position + Vector3.back * 3f, babyChicken.transform.rotation);
+        //    Debug.Log("made baby chicken");
+
+        //    currentState = BehaviourState.loitering;
+        //}
     }
 
     public override void Search()
@@ -34,10 +38,13 @@ public class ChickenAnimal : Animal
             currentState = BehaviourState.fleeing;
             Flee();
         }
-        else
-        {
-            visualField.FindNearestTarget();
-            base.Search();
-        }
+
+        // Cickens don't look for other chickens to mate in the current version
+
+        //else
+        //{
+        //    visualField.FindNearestTarget();
+        //    base.Search();
+        //}
     }
 }

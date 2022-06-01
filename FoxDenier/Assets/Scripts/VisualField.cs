@@ -59,26 +59,29 @@ public class VisualField : MonoBehaviour
         }
     }
 
-    public void FindPursuingTarget() // this is a target that is currently pursuing another target, for moose
-    {
-        float nearestDistance = transform.localScale.x;
-        nearestTarget = null;
 
-        visibleAnimals = visibleAnimals.Where(target => target != null).ToList();
+    // This method was used for the Moose which has now been cut
+
+    //public void FindPursuingTarget() // this is a target that is currently pursuing another target, for moose
+    //{
+    //    float nearestDistance = transform.localScale.x;
+    //    nearestTarget = null;
+
+    //    visibleAnimals = visibleAnimals.Where(target => target != null).ToList();
 
 
-        foreach (GameObject target in visibleAnimals)
-        {
-            float distance = Vector3.Distance(transform.position, target.transform.position);
-            if (distance < nearestDistance 
-                && GetComponentInParent<Animal>().targetType == target.GetComponent<Animal>().agentType 
-                && target.GetComponent<Animal>().currentState == Animal.BehaviourState.pursuing)
-            {
-                nearestDistance = distance;
-                nearestTarget = target;
-            }
-        }
-    }
+    //    foreach (GameObject target in visibleAnimals)
+    //    {
+    //        float distance = Vector3.Distance(transform.position, target.transform.position);
+    //        if (distance < nearestDistance 
+    //            && GetComponentInParent<Animal>().targetType == target.GetComponent<Animal>().agentType 
+    //            && target.GetComponent<Animal>().currentState == Animal.BehaviourState.pursuing)
+    //        {
+    //            nearestDistance = distance;
+    //            nearestTarget = target;
+    //        }
+    //    }
+    //}
 
     public void LookForPredator()
     {
@@ -96,6 +99,7 @@ public class VisualField : MonoBehaviour
             {
                 nearestDistance = distance;
                 nearestHuntingPredator = target;
+                // Debug.Log("fleeing from " + nearestHuntingPredator.gameObject);
             }
         }
     }

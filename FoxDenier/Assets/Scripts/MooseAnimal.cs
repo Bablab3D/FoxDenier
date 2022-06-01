@@ -12,7 +12,9 @@ public class MooseAnimal : Animal
 
     public override void Search()
     {
-        visualField.FindPursuingTarget();
+        // Moose type has now been cut from game
+
+        //visualField.FindPursuingTarget();
         base.Search();
     }
 }
