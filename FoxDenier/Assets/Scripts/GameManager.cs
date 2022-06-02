@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
         }
 
         // if there are no more chickens, game over
-        if (chickenCounter.Length <= 0)
+        if (chickenCounter.Length <= 0 && currentRound <= rounds.Count - 1)
         {
             gameOver = true;
             gameOverText.gameObject.SetActive(true);
@@ -77,13 +77,14 @@ public class GameManager : MonoBehaviour
             Destroy(barrier.gameObject);
         }
         currentRound += 1;
-        if (currentRound <= rounds.Count)
+        if (currentRound <= rounds.Count - 1)
         {
             rounds[currentRound].SetActive(true);
         } else
         {
             congratulationsText.gameObject.SetActive(true);
             restartButton.gameObject.SetActive(true);
+            gameOver = true;
         }
     }
 
