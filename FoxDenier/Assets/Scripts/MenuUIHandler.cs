@@ -41,6 +41,7 @@ public class MenuUIHandler : MonoBehaviour
         ColorHandler();
     }
 
+    // ABSTRACTION
     private void ColorHandler()
     {
         if (t1 > 0)
@@ -76,8 +77,19 @@ public class MenuUIHandler : MonoBehaviour
         }
     }
 
-    public void StartGame()
+    public void StartGameCoroutine()
     {
+        StartCoroutine(StartGame());
+    }
+
+    IEnumerator StartGame()
+    {
+        // I was having problems with the lighting when loading scenes but I think this fixes it.
+        // Thanks to radiatoryang on the unity forums (and thanks to radiatoryang for being an awesome games person in general)
         SceneManager.LoadScene(1);
+        yield return 0; // wait a frame, so it can finish loading
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(1));
+
+        // oh wait this didn't fix it. I fixed it by autogenerating lighting because it was unchecked but all the forums said to uncheck it? idk how this works.
     }
 }

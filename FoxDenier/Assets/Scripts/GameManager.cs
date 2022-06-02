@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // ABSTRACTION
     private void NextRound()
     {
         // each 'round' is an empty parent with some foxes and chickens in it,
@@ -88,8 +89,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void RestartGame()
+    public void RestartGameCoroutine()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        StartCoroutine(RestartGame());
+    }
+
+    IEnumerator RestartGame()
+    {
+        // I was having problems with the lighting when loading scenes but I think this fixes it.
+        // Thanks to radiatoryang on the unity forums (and thanks to radiatoryang for being an awesome games person in general)
+        SceneManager.LoadScene(0);
+        yield return 0; // wait a frame, so it can finish loading
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(0));
+
+        // oh wait this didn't fix it. I fixed it by autogenerating lighting because it was unchecked but all the forums said to uncheck it? idk how this works.
     }
 }

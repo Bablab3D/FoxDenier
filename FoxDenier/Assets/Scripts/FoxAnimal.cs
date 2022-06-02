@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// INHERITANCE
 public class FoxAnimal : Animal
 {
     [SerializeField] private float pursueSpeedMultiplier = 2f;
@@ -9,7 +10,7 @@ public class FoxAnimal : Animal
     //public float fleeDistance = 7.0f;
     //private Vector3 fleePoint;
 
-
+    // POLYMORPHISM
     protected override void GetCaught(AnimalType caughtBy)
     {
         // In a previouis version, there was a Moose that could scare foxes away from the chickens, but I found that the Moose made gameplay more confusing.
@@ -38,6 +39,7 @@ public class FoxAnimal : Animal
         //}
     }
 
+    // POLYMORPHISM
     // foxes run faster when pursuing their target
     public override void Pursue()
     {
@@ -46,6 +48,7 @@ public class FoxAnimal : Animal
         base.Pursue();
     }
 
+    // POLYMORPHISM
     public override void Search()
     {
         visualField.FindNearestTarget();

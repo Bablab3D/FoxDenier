@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        CameraHandler();
+        //CameraHandler();
         MouseHandler();
     }
 
@@ -53,13 +53,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void CameraHandler()
-    {
-        Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        GameCamera.transform.position = GameCamera.transform.position + new Vector3(move.x, 0, move.y) * PanSpeed * Time.deltaTime;
-        float zoom = Input.mouseScrollDelta.y;
-        GameCamera.transform.position = GameCamera.transform.position + new Vector3(0, -zoom, 0) * ZoomSpeed * Time.deltaTime;
-    }
+    //private void CameraHandler()
+    //{
+    //    Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+    //    GameCamera.transform.position = GameCamera.transform.position + new Vector3(move.x, 0, move.y) * PanSpeed * Time.deltaTime;
+    //    float zoom = Input.mouseScrollDelta.y;
+    //    GameCamera.transform.position = GameCamera.transform.position + new Vector3(0, -zoom, 0) * ZoomSpeed * Time.deltaTime;
+    //}
 
     private void MakeBarrier()
     {

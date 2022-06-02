@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// INHERITANCE
 public class ChickenAnimal : Animal
 {
     // there was chicken breeding but I removed it
     // public GameObject babyChicken;
 
+    // POLYMORPHISM
     protected override void GetCaught(AnimalType caughtBy)
     {
         if (caughtBy == AnimalType.fox)
@@ -29,6 +31,7 @@ public class ChickenAnimal : Animal
         //}
     }
 
+    // POLYMORPHISM
     // If the chicken sees a predator, it flees.
     public override void Search()
     {

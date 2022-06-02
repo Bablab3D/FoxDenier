@@ -5,12 +5,16 @@ using UnityEngine.AI;
 using TMPro;
 
 [RequireComponent(typeof(NavMeshAgent))]
+
+// INHERITANCE
 public abstract class Animal : MonoBehaviour
 {
+    // ENCAPSULATION
     [field: SerializeField] public AnimalType agentType { get; protected set; }
     [field: SerializeField] public AnimalType targetType { get; protected set; }
     public BehaviourState currentState { get; protected set; }
 
+    // ENCAPSULATION
     // this is probably overkill but this setter validation is to demonstrate encapsulation for the Unity Learn OOP deliverable
     [SerializeField] [Tooltip("please don't set this to negative")] private float m_DefaultSpeed = 3.5f;
     public float DefaultSpeed
@@ -28,7 +32,7 @@ public abstract class Animal : MonoBehaviour
             }
         }
     }
-
+    // ENCAPSULATION
     // public variables that affect animal behvaiour
     public float loiterAngles = 45f;
     public float pursuitTime = 5.0f;
@@ -138,6 +142,7 @@ public abstract class Animal : MonoBehaviour
         }
     }
 
+    // ABSTRACTION
     public virtual void Search()
     {
         // this class is overridden in both the fox and the chicken child classes
@@ -152,7 +157,8 @@ public abstract class Animal : MonoBehaviour
             currentState = BehaviourState.pursuing;
         }
     }
-    
+
+    // ABSTRACTION
     public virtual void Pursue()
     {
         if (target != null)
@@ -192,6 +198,7 @@ public abstract class Animal : MonoBehaviour
         }
     }
 
+    // ABSTRACTION
     public virtual void Rest()
     {
         // play the little eating animation while resting, regardless of whether or not animal just caught something
@@ -217,9 +224,10 @@ public abstract class Animal : MonoBehaviour
         }
     }
 
+    // INHERITANCE AN POLYMORPHISM
     protected abstract void GetCaught(AnimalType caughtBy);
 
-
+    // ABSTRACTION
     public virtual void Flee()
     {
         // Use visual field child object to find nearby predators.
