@@ -7,24 +7,49 @@ using TMPro;
 [RequireComponent(typeof(NavMeshAgent))]
 public abstract class Animal : MonoBehaviour
 {
-    public TextMeshProUGUI stateIndicator;
-    public NavMeshAgent agent;
-    public float defaultSpeed = 3.5f;
-    public BehaviourState currentState;
-    public AnimalType agentType;
-    public AnimalType targetType;
+    [field: SerializeField] public AnimalType agentType { get; protected set; }
+    [field: SerializeField] public AnimalType targetType { get; protected set; }
+    public BehaviourState currentState { get; protected set; }
+
+    // this is probably overkill but this setter validation is to demonstrate encapsulation for the Unity Learn OOP deliverable
+    [SerializeField] [Tooltip("please don't set this to negative")] private float m_DefaultSpeed = 3.5f;
+    public float DefaultSpeed
+    {
+        get { return m_DefaultSpeed; }
+        set
+        {
+            if (value < 0.0f)
+            {
+                Debug.Log("default speed can not be negative");
+            }
+            else
+            {
+                m_DefaultSpeed = value;
+            }
+        }
+    }
+
+    // public variables that affect animal behvaiour
     public float loiterAngles = 45f;
     public float pursuitTime = 5.0f;
     public float restTime = 2.0f;
-    public float pTimer;
+
+    // private or protected variables that probably could be declared in their methods but
+    // I couldn't figure out how to do that without causing issues.
+    protected float pTimer;
     private float rTimer;
     private bool isReorinting;
-    [System.NonSerialized] public GameObject target;
-    // public GameObject pursuedByInstance;
-    [System.NonSerialized] public GameObject caughtByInstance;
-    [System.NonSerialized] public VisualField visualField;
+    protected string stateVoice;
 
+    // objects and classes that let this class interact with other animals and the visual field child object helper
+    // target is public because the target needs to be cleared by the agent's victim if it's been eaten
+    public GameObject target;
+    protected GameObject caughtByInstance;
+    protected VisualField visualField;
+    protected TextMeshProUGUI stateIndicator;
     private Animator animAnim;
+    protected NavMeshAgent agent;
+    // public GameObject pursuedByInstance;
 
     public enum BehaviourState
     {
@@ -41,7 +66,7 @@ public abstract class Animal : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         visualField = GetComponentInChildren<VisualField>();
         animAnim = GetComponentInChildren<Animator>();
-        agent.speed = defaultSpeed;
+        agent.speed = DefaultSpeed;
         isReorinting = true;
         stateIndicator = GetComponentInChildren<TextMeshProUGUI>();
 
@@ -55,15 +80,6 @@ public abstract class Animal : MonoBehaviour
 
     void Update()
     {
-        // 43.22 is the current angle of the camera. I know this is a bad magic number 
-        // but I couldn't be bothered doing the whole make GameManager a singleton and get camera from GameManager thing.
-        // this script works for the meantime to get the status indicator UI element to appear correctly on the players screen.
-
-        stateIndicator.transform.eulerAngles = new Vector3(43.22f, 0f, 0f);
-        // stateIndicator.transform.rotation = playerCamera.transform.rotation;
-
-        stateIndicator.text = currentState.ToString();
-
         // this checks the current state of the animal, which is manipulated by various functions
         switch (currentState)
         {
@@ -193,7 +209,7 @@ public abstract class Animal : MonoBehaviour
             rTimer -= Time.deltaTime;
             if (rTimer <= 0f)
             {
-                agent.speed = defaultSpeed;
+                agent.speed = DefaultSpeed;
                 target = null;
                 currentState = BehaviourState.loitering;
                 rTimer = restTime;

@@ -16,13 +16,10 @@ public class VisualField : MonoBehaviour
         nearestTarget = null;
     }
 
+    // no update method
 
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    // OnTriggerEnter and OnTriggerExit functions keep a list of animals that the agent (parent object) can currently 'see'
 
     private void OnTriggerEnter(Collider other)
     {
@@ -46,8 +43,10 @@ public class VisualField : MonoBehaviour
         float nearestDistance = transform.localScale.x;
         nearestTarget = null;
 
+        // need to clear list of any empty objects in case they got eaten :)
         visibleAnimals = visibleAnimals.Where(target => target != null).ToList();
 
+        // find the closest animal that is the same type as the agent's target type (eg. a fox's target is a chicken)
         foreach (GameObject target in visibleAnimals)
         {
             float distance = Vector3.Distance(transform.position, target.transform.position);
@@ -59,6 +58,34 @@ public class VisualField : MonoBehaviour
         }
     }
 
+    // Sane as FindNearestTarget but looking for predators that are not of the same type as the agent (so that chickens don't think other chickens are predators)
+    public void LookForPredator()
+    {
+        float nearestDistance = transform.localScale.x;
+        nearestHuntingPredator = null;
+
+        visibleAnimals = visibleAnimals.Where(target => target != null).ToList();
+
+        foreach (GameObject target in visibleAnimals)
+        {
+            float distance = Vector3.Distance(transform.position, target.transform.position);
+            if (distance < nearestDistance
+                && GetComponentInParent<Animal>().agentType == target.GetComponent<Animal>().targetType
+                && GetComponentInParent<Animal>().agentType != target.GetComponent<Animal>().agentType)
+            {
+                nearestDistance = distance;
+                nearestHuntingPredator = target;
+                // Debug.Log("fleeing from " + nearestHuntingPredator.gameObject);
+            }
+        }
+    }
+
+    // draw the agent's visual field.
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, transform.localScale.x/2);
+    }
 
     // This method was used for the Moose which has now been cut
 
@@ -82,27 +109,4 @@ public class VisualField : MonoBehaviour
     //        }
     //    }
     //}
-
-    public void LookForPredator()
-    {
-        float nearestDistance = transform.localScale.x;
-        nearestHuntingPredator = null;
-
-        visibleAnimals = visibleAnimals.Where(target => target != null).ToList();
-
-        foreach (GameObject target in visibleAnimals)
-        {
-            float distance = Vector3.Distance(transform.position, target.transform.position);
-            if (distance < nearestDistance
-                && GetComponentInParent<Animal>().agentType == target.GetComponent<Animal>().targetType
-                && GetComponentInParent<Animal>().agentType != target.GetComponent<Animal>().agentType)
-            {
-                nearestDistance = distance;
-                nearestHuntingPredator = target;
-                // Debug.Log("fleeing from " + nearestHuntingPredator.gameObject);
-            }
-        }
-    }
-
-
 }

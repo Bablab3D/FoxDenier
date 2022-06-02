@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class FoxAnimal : Animal
 {
-    public float fleeDistance = 7.0f;
-    private Vector3 fleePoint;
+    [SerializeField] private float pursueSpeedMultiplier = 2f;
+
+    //public float fleeDistance = 7.0f;
+    //private Vector3 fleePoint;
 
 
     protected override void GetCaught(AnimalType caughtBy)
     {
         // In a previouis version, there was a Moose that could scare foxes away from the chickens, but I found that the Moose made gameplay more confusing.
+        // so now the fox does nothing when it gets caught because there are no animals who pursue and catch the fox.
 
         //if (caughtBy == AnimalType.moose)
         //{
@@ -35,9 +38,10 @@ public class FoxAnimal : Animal
         //}
     }
 
+    // foxes run faster when pursuing their target
     public override void Pursue()
     {
-        agent.speed = defaultSpeed * 2;
+        agent.speed = DefaultSpeed * pursueSpeedMultiplier;
 
         base.Pursue();
     }
@@ -47,24 +51,55 @@ public class FoxAnimal : Animal
         visualField.FindNearestTarget();
         base.Search();
     }
-    public override void Flee()
+
+    private void LateUpdate()
     {
-        agent.destination = fleePoint;
+        // 43.22 is the current angle of the camera. I know this is a bad magic number 
+        // but I couldn't be bothered doing the whole make GameManager a singleton and get camera from GameManager thing.
+        // this script works for the meantime to get the status indicator UI element to appear correctly on the players screen.
 
-        if (pTimer > 0f)
+        stateIndicator.transform.eulerAngles = new Vector3(43.22f, 0f, 0f);
+        // stateIndicator.transform.rotation = playerCamera.transform.rotation;
+
+        switch (currentState)
         {
-            pTimer -= Time.deltaTime;
-
-            if (Vector3.Distance(transform.position, fleePoint) < 1.0f)
-            {
-                currentState = BehaviourState.resting;
-                pTimer = pursuitTime;
-            }
-            else if (pTimer <= 0f)
-            {
-                currentState = BehaviourState.resting;
-                pTimer = pursuitTime;
-            }
+            case BehaviourState.loitering:
+                stateVoice = "\"i want chicken\"";
+                break;
+            case BehaviourState.pursuing:
+                stateVoice = "\"YUMMY\"";
+                break;
+            case BehaviourState.resting:
+                stateVoice = "*sniff sniff*";
+                break;
+            case BehaviourState.fleeing:
+                stateVoice = "\"AAAAHHHHH\"";
+                break;
         }
+
+        stateIndicator.text = stateVoice;
     }
+
+    // When the mooses were around, the foxes would flee away from the chicken and moose.
+
+    //public override void Flee()
+    //{
+    //    agent.destination = fleePoint;
+
+    //    if (pTimer > 0f)
+    //    {
+    //        pTimer -= Time.deltaTime;
+
+    //        if (Vector3.Distance(transform.position, fleePoint) < 1.0f)
+    //        {
+    //            currentState = BehaviourState.resting;
+    //            pTimer = pursuitTime;
+    //        }
+    //        else if (pTimer <= 0f)
+    //        {
+    //            currentState = BehaviourState.resting;
+    //            pTimer = pursuitTime;
+    //        }
+    //    }
+    //}
 }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ChickenAnimal : Animal
 {
-    public GameObject babyChicken;
-
+    // there was chicken breeding but I removed it
+    // public GameObject babyChicken;
 
     protected override void GetCaught(AnimalType caughtBy)
     {
@@ -29,6 +29,7 @@ public class ChickenAnimal : Animal
         //}
     }
 
+    // If the chicken sees a predator, it flees.
     public override void Search()
     {
         visualField.LookForPredator();
@@ -40,11 +41,40 @@ public class ChickenAnimal : Animal
         }
 
         // Cickens don't look for other chickens to mate in the current version
+        // But when they did they would only look for chickens to mate if there were no foxes to run from
 
         //else
         //{
         //    visualField.FindNearestTarget();
         //    base.Search();
         //}
+    }
+
+    private void LateUpdate()
+    {
+        // 43.22 is the current angle of the camera. I know this is a bad magic number 
+        // but I couldn't be bothered doing the whole make GameManager a singleton and get camera from GameManager thing.
+        // this script works for the meantime to get the status indicator UI element to appear correctly on the players screen.
+
+        stateIndicator.transform.eulerAngles = new Vector3(43.22f, 0f, 0f);
+        // stateIndicator.transform.rotation = playerCamera.transform.rotation;
+
+        switch (currentState)
+        {
+            case BehaviourState.loitering:
+                stateVoice = "\"cluck cluck\"";
+                break;
+            case BehaviourState.pursuing:
+                stateVoice = "\"cluck cluck\"";
+                break;
+            case BehaviourState.resting:
+                stateVoice = "*pecks ground*";
+                break;
+            case BehaviourState.fleeing:
+                stateVoice = "\"AAAAHHHHH\"";
+                break;
+        }
+        
+        stateIndicator.text = stateVoice;
     }
 }
